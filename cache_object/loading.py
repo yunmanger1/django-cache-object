@@ -32,9 +32,10 @@ class Cache(object):
     provide reverse-relations and for app introspection (e.g. admin).
     """
 
-    def __init__(self, key, module_name = None):
+    def __init__(self, key, module_name = None, app_list = settings.INSTALLED_APPS):
         self.__dict__ = get_state(key)
         self.module_name = module_name
+        self.app_list = app_list
 
     def __contains__(self, key):
         self._populate()
@@ -53,7 +54,7 @@ class Cache(object):
             if self.loaded:
                 return
             loading.cache._populate()
-            for app_label in settings.INSTALLED_APPS:
+            for app_label in self.app_list:
                 try:
                     import_module('.{0}'.format(self.module_name), app_label)
                 except ImportError:
